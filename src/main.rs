@@ -17,6 +17,7 @@ fn main() {
   
   listener.register_route("GET", "/", hello(&HELLO)).unwrap();
   listener.register_route("GET", "/hello", hello(&HELLO)).unwrap();
+  listener.register_route("GET", "/goodbye", Box::new(goodbye)).unwrap();
   listener.register_not_found(not_found(&NOT_FOUND));
 
   listener.start().unwrap();
@@ -34,6 +35,15 @@ fn hello(page: &'static str) -> Handler {
   };
 
   Box::new(handler)
+}
+
+fn goodbye(request: &Request) -> String {
+  let message = match request.params.get("name") {
+    Some(name) => format!("Goodbye {}!!", name),
+    None => String::from("Goodbye anonymous!!")
+  };
+
+  String::from(message)
 }
 
 fn not_found(page: &'static str) -> Handler {
